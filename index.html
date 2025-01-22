@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e90ff, #6a5acd);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .form-container, .log-container {
+            width: 350px;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+        }
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        label, input, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        input, button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            background: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Verify Your Account</h1>
+        <form id="verifyForm">
+            <label for="discordId">Discord User ID</label>
+            <input type="text" id="discordId" name="discordId" required>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+            <label for="file">Upload File</label>
+            <input type="file" id="file" name="file" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div class="log-container" id="logContainer">
+        <h2>Submissions Log</h2>
+    </div>
+
+    <script>
+        document.getElementById('verifyForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const discordId = document.getElementById('discordId').value;
+            const username = document.getElementById('username').value;
+            const fileInput = document.getElementById('file').files[0];
+            const formData = new FormData();
+            formData.append('discordId', discordId);
+            formData.append('username', username);
+            formData.append('file', fileInput);
+
+            fetch('/api/data', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => addLog(discordId, username, data.fileUrl))
+                .catch(error => alert('Error submitting data.'));
+        });
+
+        function addLog(discordId, username, fileUrl) {
+            const logBox = document.createElement('div');
+            logBox.innerHTML = `<p><b>ID:</b> ${discordId} <b>Username:</b> ${username} <a href="${fileUrl}">Download</a></p>`;
+            document.getElementById('logContainer').appendChild(logBox);
+        }
+    </script>
+</body>
+</html>
